@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laporan Harian Serah Terima Punch</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background: #f4f7fc; color: #333; display: flex; flex-direction: column; min-height: 100vh; margin: 0; }
+    header { background: #136dec; color: white; text-align: center; padding: 1rem; }
+    main { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 2rem; }
+    form { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
+    label { display: block; margin-top: 1rem; font-weight: 600; }
+    input, select, textarea {
+      width: 100%; margin-top: 0.3rem; padding: 0.8rem;
+      border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;
+    }
+    textarea { resize: none; height: 80px; }
+    button {
+      width: 100%; margin-top: 1.5rem; padding: 0.9rem;
+      background: #136dec; color: white; border: none;
+      border-radius: 8px; font-weight: bold; font-size: 1rem;
+      cursor: pointer; transition: background 0.3s;
+    }
+    button:hover { background: #0e56b0; }
+    footer { background: #f0f0f0; text-align: center; padding: 1rem; font-size: 0.9rem; }
+    .success { color: green; margin-top: 10px; font-weight: bold; text-align: center; }
+    .error { color: red; margin-top: 10px; font-weight: bold; text-align: center; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📋 Laporan Harian Serah Terima Punch</h1>
+  </header>
+
+  <main>
+    <form id="laporanForm">
+      <label for="tanggal">Tanggal:</label>
+      <input type="date" id="tanggal" required />
+
+      <label for="side">Lower / Upper:</label>
+      <select id="side" required>
+        <option value="">-- Pilih --</option>
+        <option value="Lower">Lower</option>
+        <option value="Upper">Upper</option>
+      </select>
+
+      <label for="ukuran">Ukuran:</label>
+      <input type="text" id="ukuran" placeholder="Contoh: 50x20" required />
+
+      <label for="tebal">Tebal:</label>
+      <input type="text" id="tebal" placeholder="Contoh: 1.2 mm" required />
+
+      <label for="plant">Dari Plant:</label>
+      <select id="plant" required>
+        <option value="">-- Pilih Plant --</option>
+        <option>FT1</option><option>FT2</option><option>FT3</option>
+        <option>FT4</option><option>FT5</option><option>HT</option>
+        <option>WT1</option><option>WT2</option>
+      </select>
+
+      <label for="keterangan">Keterangan (opsional):</label>
+      <textarea id="keterangan" placeholder="Tambahkan catatan di sini..."></textarea>
+
+      <button type="submit">📤 Kirim ke Spreadsheet</button>
+      <p id="statusMsg"></p>
+    </form>
+  </main>
+
+  <footer>
+    <p>© 2025 Laporan Harian Serah Terima Punch</p>
+  </footer>
+
+  <script>
+    const form = document.getElementById('laporanForm');
+    const statusMsg = document.getElementById('statusMsg');
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyZkXxYxx.../exec"; // Ganti ini!
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        tanggal: document.getElementById('tanggal').value,
+        side: document.getElementById('side').value,
+        ukuran: document.getElementById('ukuran').value,
+        tebal: document.getElementById('tebal').value,
+        plant: document.getElementById('plant').value,
+        keterangan: document.getElementById('keterangan').value
+      };
+
+      statusMsg.textContent = "⏳ Mengirim data...";
+      statusMsg.className = "";
+
+      try {
+        const res = await fetch(WEB_APP_URL, {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" }
+        });
+        const result = await res.json();
+
+        if (result.result === "success") {
+          statusMsg.textContent = "✅ Laporan berhasil dikirim!";
+          statusMsg.className = "success";
+          form.reset();
+        } else {
+          statusMsg.textContent = "⚠️ Gagal mengirim laporan.";
+          statusMsg.className = "error";
+        }
+      } catch (err) {
+        statusMsg.textContent = "❌ Terjadi kesalahan koneksi!";
+        statusMsg.className = "error";
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
